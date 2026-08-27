@@ -9,9 +9,11 @@ __pycache__/
 .env
 !.env.example
 
-# Local learning guides & generated PDFs
+# Local learning guides, PDFs, and helper scripts
 docs/
+scripts/
 *.pdf
+
 
 # Node / Frontend
 frontend/node_modules/
