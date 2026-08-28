@@ -5,7 +5,6 @@ import ProgressTracker from './components/ProgressTracker';
 import ReportViewer from './components/ReportViewer';
 import VerifiedClaimsCard from './components/VerifiedClaimsCard';
 import SourcesDrawer from './components/SourcesDrawer';
-import StateInspector from './components/StateInspector';
 import { checkBackendHealth, executeResearch } from './services/api';
 import { AlertCircle } from 'lucide-react';
 
@@ -18,7 +17,6 @@ export default function App() {
   const [systemHealth, setSystemHealth] = useState(null);
 
   useEffect(() => {
-    // Initial backend health check
     checkBackendHealth().then((health) => setSystemHealth(health));
   }, []);
 
@@ -43,10 +41,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-gray-100 flex flex-col selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <Header systemHealth={systemHealth} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8">
         <QueryInput
           query={query}
           setQuery={setQuery}
@@ -55,8 +53,8 @@ export default function App() {
         />
 
         {error && (
-          <div className="p-4 mb-8 rounded-xl bg-rose-950/50 border border-rose-500/40 text-rose-300 flex items-center space-x-3 text-sm">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+          <div className="p-4 mb-6 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center space-x-3 text-sm">
+            <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -68,16 +66,19 @@ export default function App() {
             <ReportViewer report={researchData.report} />
             <VerifiedClaimsCard claims={researchData.verified_claims} />
             <SourcesDrawer sources={researchData.sources} />
-            <StateInspector stateData={researchData} />
           </>
         )}
       </main>
 
-      <footer className="border-t border-gray-800/80 py-6 bg-gray-900/30 text-center text-xs text-gray-500">
-        <div className="max-w-7xl mx-auto px-4">
-          Multi-Agent Research System • Learning & Portfolio Project • Built with FastAPI, LangGraph, Pydantic, React & Tailwind CSS
+      <footer className="border-t border-slate-200 py-4 bg-white text-center text-xs text-slate-500">
+        <div className="max-w-5xl mx-auto px-4">
+          Multi Agent Research assistant
         </div>
       </footer>
     </div>
   );
 }
+
+
+
+
