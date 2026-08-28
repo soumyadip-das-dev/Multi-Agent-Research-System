@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { FileText, Copy, Check } from 'lucide-react';
+import { Copy, Check, ExternalLink } from 'lucide-react';
 
 export default function ReportViewer({ report }) {
   const [copied, setCopied] = useState(false);
@@ -13,40 +13,67 @@ export default function ReportViewer({ report }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const markdownComponents = {
+    a: ({ node, ...props }) => (
+      <a {...props} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-blue-600 hover:underline">
+        {props.children}
+        <ExternalLink className="w-3 h-3 inline" />
+      </a>
+    ),
+    code: ({ node, inline, className, children, ...props }) => {
+      const text = String(children).replace(/\n$/, '');
+      if (text === 'HIGH') {
+        return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">HIGH</span>;
+      }
+      if (text === 'MEDIUM') {
+        return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">MEDIUM</span>;
+      }
+      if (text === 'LOW') {
+        return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-red-50 text-red-800 border border-red-200">LOW</span>;
+      }
+      return <code {...props} className={className}>{children}</code>;
+    }
+  };
+
   return (
-    <div className="glass-panel rounded-2xl p-6 sm:p-8 mb-8 border border-gray-800 shadow-xl">
-      <div className="flex items-center justify-between pb-6 mb-6 border-b border-gray-800">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
-            <FileText className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-white">Synthesized Research Report</h2>
-            <p className="text-xs text-gray-400">Structured synthesis by Synthesizer Agent</p>
-          </div>
+    <div className="bg-white rounded-xl p-6 sm:p-7 mb-6 border border-slate-200 shadow-xs">
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-slate-200 gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900">Synthesized Research Report</h2>
+          <p className="text-xs text-slate-500">Generated from web and academic literature evidence</p>
         </div>
 
-        <button
-          onClick={handleCopy}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium border border-gray-700 transition"
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-3.5 h-3.5 text-gray-400" />
-              <span>Copy Report</span>
-            </>
-          )}
-        </button>
+        <div>
+          <button
+            onClick={handleCopy}
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs border border-slate-200 transition cursor-pointer"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-emerald-700 font-medium">Copied</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-slate-500" />
+                <span>Copy</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      <div className="prose prose-invert max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h1:text-indigo-300 prose-h2:text-lg prose-h2:text-purple-300 prose-h2:mt-6 prose-h2:mb-3 prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-gray-300 prose-a:text-indigo-400 prose-a:underline hover:prose-a:text-indigo-300 prose-strong:text-white">
-        <ReactMarkdown>{report}</ReactMarkdown>
+      {/* Markdown Body */}
+      <div className="markdown-report">
+        <ReactMarkdown components={markdownComponents}>
+          {report}
+        </ReactMarkdown>
       </div>
     </div>
   );
 }
+
+
+
+
