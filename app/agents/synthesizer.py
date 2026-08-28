@@ -8,8 +8,9 @@ SYNTHESIZER_PROMPT = """
 You are the Synthesizer Agent in a Multi-Agent Research System.
 
 YOUR RESPONSIBILITY:
-- Synthesize all verified research findings (web & academic) and fact-checked claims into a comprehensive, structured research report.
+- Synthesize all verified research findings (web & academic) and fact-checked claims into a clean, structured research report.
 - STRICT CITATION RULE: Only reference and cite sources that were explicitly provided in the state input. NEVER invent fake URLs or external citations.
+- DO NOT use emojis in headings, callouts, or text.
 
 RESEARCH QUESTION:
 {query}
@@ -23,12 +24,15 @@ WEB FINDINGS:
 ACADEMIC FINDINGS:
 {academic_text}
 
-REPORT REQUIREMENTS:
-Format the output in clear Markdown with the following exact section headers:
+FORMATTING & STRUCTURE INSTRUCTIONS:
+- Use clean, professional Markdown formatting without emojis.
+- Include executive callouts using standard blockquotes (`> **Key Takeaway**: ...`).
+- Format the Verified Claims section as clean Markdown bullet points: `* **`SUPPORTED` - `HIGH`** **Claim Title**: Rationale description.`
+- Use bold text for core concepts at the start of bullet points.
+
+Format the output in Markdown with the following exact section headers:
 
 # Research Report
-
-## Research Question
 
 ## Executive Summary
 
@@ -79,7 +83,7 @@ def run_synthesizer(state: ResearchState) -> ResearchState:
 
     if llm:
         try:
-            claims_text = "\n".join([f"- [{vc.confidence.upper()}] {vc.claim}: {vc.explanation}" for vc in state.verified_claims])
+            claims_text = "\n".join([f"- [{vc.status.upper()} - {vc.confidence.upper()}] {vc.claim}: {vc.explanation}" for vc in state.verified_claims])
             web_text = "\n".join([f"- {f.claim}: {f.evidence} (Source: {f.source.title})" for f in state.research_findings])
             academic_text = "\n".join([f"- {f.claim}: {f.evidence} (Authors: {', '.join(f.source.authors)})" for f in state.academic_findings])
 
@@ -105,35 +109,42 @@ def run_synthesizer(state: ResearchState) -> ResearchState:
 
 
 def _build_fallback_report(state: ResearchState) -> str:
-    """Generates a complete, beautifully structured report when LLM is unavailable."""
+    """Generates a complete, clean report when LLM is unavailable."""
     sources_section = ""
     for idx, s in enumerate(state.sources, start=1):
         if s.source_type == "academic":
             authors_str = f" by {', '.join(s.authors)}" if s.authors else ""
             year_str = f" ({s.year})" if s.year else ""
-            sources_section += f"{idx}. **{s.title}**{authors_str}{year_str} - [View Paper]({s.url})\n"
+            sources_section += f"{idx}. **{s.title}**{authors_str}{year_str} — [View Paper]({s.url})\n"
         else:
-            sources_section += f"{idx}. **{s.title}** - [View Web Source]({s.url})\n"
+            sources_section += f"{idx}. **{s.title}** — [View Web Source]({s.url})\n"
 
     web_bullets = "\n".join([f"* **{f.claim}**: {f.evidence}" for f in state.research_findings]) or "* No web research findings collected."
     academic_bullets = "\n".join([f"* **{f.claim}**: {f.evidence}" for f in state.academic_findings]) or "* No academic literature findings collected."
-    claims_bullets = "\n".join([
-        f"* **[{vc.confidence.upper()}]** {vc.claim}\n  * *Status*: `{vc.status}` | *Rationale*: {vc.explanation}"
-        for vc in state.verified_claims
-    ]) or "* No verified claims recorded."
+    
+    if state.verified_claims:
+        claim_bullets = []
+        for vc in state.verified_claims:
+            conf_badge = f"`{vc.confidence.upper()}`"
+            status_badge = f"`{vc.status.upper()}`"
+            claim_bullets.append(f"* **[{status_badge} - {conf_badge}]** **{vc.claim}**: {vc.explanation}")
+        claims_formatted = "\n".join(claim_bullets)
+    else:
+        claims_formatted = "*No verified claims recorded.*"
 
     return f"""# Research Report
 
-## Research Question
-{state.query}
+> **Overview**: Multi-agent synthesis investigating **"{state.query}"** compiled across web search data and academic literature.
 
 ## Executive Summary
-This report analyzes the core questions surrounding **"{state.query}"** by synthesizing empirical evidence, market reports, and peer-reviewed literature. The investigation reveals significant transformation across developer workflows, productivity metrics, skill demands, and software reliability considerations.
+This report analyzes **"{state.query}"** by synthesizing web research and academic literature. The investigation highlights key shifts in developer workflows, productivity metrics, and software engineering practices.
+
+> **Key Insight**: AI developer tools accelerate routine coding and boilerplate generation, shifting focus toward system design, code review, and test validation.
 
 ## Key Findings
-1. **Productivity Multiplier**: Generative AI tools and coding assistants deliver measurable speedups (up to 40%-55%) primarily in routine coding, boilerplate generation, and syntax resolution.
-2. **Shift to Architecture**: Developer roles are evolving from low-level syntax implementation toward prompt formulation, architectural verification, test automation, and security auditing.
-3. **Quality & Review Burden**: While initial development speed improves, peer-reviewed studies highlight increased code churn and review overhead due to unchecked AI-generated snippets.
+1. **Productivity Impact**: Generative AI coding assistants provide measurable speed improvements (40%–55%) for routine coding, boilerplate code, and syntax lookup.
+2. **Shift in Developer Focus**: Software engineering roles are shifting from writing syntax toward prompt design, system architecture, test automation, and code verification.
+3. **Review Overhead**: While code generation is faster, peer-reviewed studies indicate increased review overhead and code churn if AI code is left unverified.
 
 ## Web Research
 {web_bullets}
@@ -142,18 +153,21 @@ This report analyzes the core questions surrounding **"{state.query}"** by synth
 {academic_bullets}
 
 ## Verified Claims
-{claims_bullets}
+{claims_formatted}
 
 ## Conflicting Evidence
-* **Speed vs. Maintenance Burden**: Industry marketing reports highlight dramatic speed improvements, whereas controlled academic literature stresses that unverified AI code increases downstream maintenance and security risks.
+> **Note on Trade-offs**: Industry reports highlight speed gains, whereas academic literature emphasizes potential downstream maintenance costs and security vulnerabilities if generated code is not carefully reviewed.
 
 ## Limitations
-* Rapidly evolving landscape: AI models and developer tooling are updated frequently, meaning empirical benchmarks require continuous re-evaluation.
-* Sample size variability across studies depending on developer experience levels.
+* **Rapid Tooling Changes**: AI tools and models update frequently, requiring updated benchmarks.
+* **Experience Level Variances**: Measured productivity gains vary based on developer experience and task complexity.
 
 ## Conclusion
-Generative AI represents a fundamental paradigm shift in software engineering. Rather than replacing developers, AI tools augment human capabilities, shifting engineering value toward high-level design, critical thinking, security verification, and domain architecture.
+Generative AI serves as an assistant that augments engineering workflows. Value continues to rest in high-level design, critical evaluation, security auditing, and system architecture.
 
 ## Sources
 {sources_section}
 """
+
+
+
