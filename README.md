@@ -1,207 +1,166 @@
-# Multi-Agent Research System
+# 🚀 Multi-Agent Research System
 
-A clean, modular, learning-focused **Multi-Agent Research System** built with Python, FastAPI, LangGraph, Pydantic, Tavily Web Search, Semantic Scholar Academic Search, and a modern React + Tailwind CSS frontend dashboard.
+![LangGraph](https://img.shields.io/badge/LangGraph-StateGraph-0055FF?style=flat-square&logo=langchain&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?style=flat-square&logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
----
-
-## 1. Overview
-
-The **Multi-Agent Research System** takes a user's research question, decomposes it into specialized subtasks, delegates work across distinct AI agents (web research, academic paper search, fact-checking), collects evidence, and synthesizes a structured research report with authentic source citations.
-
-### Problem
-Single prompt-based LLM queries often suffer from:
-* Hallucinated links and unverifiable claims.
-* Lack of academic rigor or peer-reviewed citations.
-* Monolithic prompt execution without modular delegation or auditability.
-
-### Solution
-This project demonstrates practical multi-agent orchestration by dividing research responsibilities into **5 specialized agent nodes** connected via **LangGraph**:
-1. **Orchestrator Agent**: Analyzes queries and decomposes them into web and academic tasks.
-2. **Research Agent**: Performs web research using Tavily API.
-3. **Academic Agent**: Queries peer-reviewed literature using Semantic Scholar API.
-4. **Fact Checker Agent**: Validates claims against evidence and tags confidence levels (`HIGH`, `MEDIUM`, `LOW`).
-5. **Synthesizer Agent**: Combines verified findings into a structured report citing only real, supplied sources.
+> 🔗 **Live Demo / API Endpoint:** [`http://localhost:8000/docs`](http://localhost:8000/docs)  
+> **Try the live system with sample research questions and see automated multi-agent synthesis & fact-checking in action.**
 
 ---
 
-## 2. System Architecture
+## 🎯 Problem Statement
 
-```text
-                              USER QUERY
-                                  |
-                                  v
-                         +----------------+
-                         |  Orchestrator  |
-                         |     Agent      |
-                         +-------+--------+
-                                 |
-                      +----------+----------+
-                      |                     |
-                      v                     v
-              +---------------+     +---------------+
-              |   Research    |     |   Academic    |
-              |     Agent     |     |     Agent     |
-              +-------+-------+     +-------+-------+
-                      |                     |
-                      +----------+----------+
-                                 |
-                                 v
-                        +----------------+
-                        |  Fact Checker  |
-                        |     Agent      |
-                        +-------+--------+
-                                |
-                                v
-                        +----------------+
-                        |  Synthesizer   |
-                        |     Agent      |
-                        +-------+--------+
-                                |
-                                v
-                         FINAL REPORT
+Manual web and literature research is **slow, tedious, and prone to error**. Single prompt-based LLM queries frequently suffer from:
+- **Hallucinated URLs** and fake academic citations.
+- **Lack of peer-reviewed rigor** and source verification.
+- **Monolithic context overload** without modular task delegation or auditability.
+
+This system uses a **team of specialized AI agents** to decompose research questions into subtasks, execute concurrent web and academic search, fact-check claims against raw evidence, and synthesize verified reports with authentic citations.
+
+---
+
+## 🏛️ Architecture Overview
+
+```mermaid
+flowchart TD
+    SubGraph1[User Query Input] --> Orchestrator[Orchestrator Agent<br/><i>Task Decomposition</i>]
+    
+    Orchestrator --> WebAgent[Research Agent<br/><i>Tavily Web Search API</i>]
+    Orchestrator --> AcadAgent[Academic Agent<br/><i>Semantic Scholar API</i>]
+    
+    WebAgent --> FactChecker[Fact Checker Agent<br/><i>Claim Validation & Confidence Scoring</i>]
+    AcadAgent --> FactChecker
+    
+    FactChecker --> Synthesizer[Synthesizer Agent<br/><i>Markdown Report Compiler</i>]
+    Synthesizer --> FinalReport([Auditable Research Report<br/><i>Output</i>])
+
+    subgraph State ["Shared State & Memory (LangGraph + Pydantic)"]
+        Memory[("ResearchState<br/>• tasks: list[ResearchTask]<br/>• findings: list[Finding]<br/>• verified_claims: list[VerifiedClaim]<br/>• sources: list[Source]")]
+    end
+
+    Orchestrator .-> State
+    WebAgent .-> State
+    AcadAgent .-> State
+    FactChecker .-> State
+    Synthesizer .-> State
 ```
 
 ---
 
-## 3. Agents Breakdown
+<table>
+<tr>
+<td width="50%" valign="top">
 
-| Agent | Responsibility | Output |
-| :--- | :--- | :--- |
-| **Orchestrator Agent** | Analyzes the research question and decomposes it into subtasks. | List of `ResearchTask` (`type: "web"` or `"academic"`) |
-| **Research Agent** | Executes web research tasks via Tavily API. | List of `Finding` objects with web source URLs |
-| **Academic Agent** | Searches literature via Semantic Scholar API. | List of `Finding` objects with paper titles, authors, and year |
-| **Fact Checker Agent** | Compares claims against evidence and identifies contradictions. | List of `VerifiedClaim` objects with confidence scores (`HIGH`, `MEDIUM`, `LOW`) |
-| **Synthesizer Agent** | Compiles verified findings into a final Markdown research report. | Structured Markdown report adhering strictly to supplied sources |
+### ✨ Key Features
+
+- ✅ **Multi-Agent Orchestration**: StateGraph control flow powered by **LangGraph**.
+- ✅ **Dual-Source Retrieval**: Web search via **Tavily API** + Academic paper search via **Semantic Scholar**.
+- ✅ **Automated Fact-Checking**: Validates claims against raw evidence with confidence levels (`HIGH`, `MEDIUM`, `LOW`).
+- ✅ **Strict Citation Integrity**: Only real, retrieved sources are permitted in the final report.
+- ✅ **Interactive Dashboard**: Modern dark-themed UI built with **React 19** & **Tailwind CSS v4**.
+
+</td>
+<td width="50%" valign="top">
+
+### 🔗 Tech Stack
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-1C3C3C?style=flat-square&logo=langchain&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white)
+
+![Pydantic](https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white)
+![Tavily](https://img.shields.io/badge/Tavily_Search-4B0082?style=flat-square)
+![React](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Tailwind](https://img.shields.io/badge/Tailwind_v4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white)
+
+</td>
+</tr>
+</table>
 
 ---
 
-## 4. Shared Research State (`ResearchState`)
+## 📋 How to Run Locally
 
-State is managed cleanly across agent nodes using Pydantic:
+```bash
+git clone https://github.com/username/multi-agent-research-system.git && cd multi-agent-research-system
+python -m venv .venv && source .venv/bin/activate # (or .\.venv\Scripts\activate on Windows)
+pip install -r requirements.txt && cd frontend && npm install && cd ..
+uvicorn app.main:app --reload & cd frontend && npm run dev
+```
+
+---
+
+<div align="center">
+
+⭐ **Star the repo if you find it useful!** &nbsp;&nbsp;•&nbsp;&nbsp; 💬 **Issues & PRs are welcome!** 🚀
+
+</div>
+
+---
+
+## 🤖 Agents Breakdown
+
+| Agent Node | Responsibility | Primary Tool / Output |
+| :--- | :--- | :--- |
+| **Orchestrator Agent** | Analyzes research queries and decomposes them into focused subtasks. | List of `ResearchTask` (`type: "web"` or `"academic"`) |
+| **Research Agent** | Executes web searches to retrieve current news, web pages, and articles. | **Tavily API** → List of web `Finding` objects |
+| **Academic Agent** | Searches peer-reviewed literature for journal papers and studies. | **Semantic Scholar API** → List of academic `Finding` objects |
+| **Fact Checker Agent** | Cross-references extracted claims against evidence & identifies contradictions. | List of `VerifiedClaim` objects with `HIGH` / `MED` / `LOW` confidence |
+| **Synthesizer Agent** | Compiles verified findings into a structured, citation-backed report. | Final Markdown Report adhering strictly to supplied sources |
+
+---
+
+## 📦 Shared Research State (`ResearchState`)
+
+State is strictly validated across agent nodes using Pydantic:
 
 ```python
 class ResearchState(BaseModel):
     query: str
-    tasks: list[ResearchTask]
-    research_findings: list[Finding]
-    academic_findings: list[Finding]
-    claims: list[str]
-    verified_claims: list[VerifiedClaim]
-    final_report: str
-    sources: list[Source]
-    status: str
-    error: Optional[str]
+    tasks: list[ResearchTask] = []
+    research_findings: list[Finding] = []
+    academic_findings: list[Finding] = []
+    claims: list[str] = []
+    verified_claims: list[VerifiedClaim] = []
+    final_report: str = ""
+    sources: list[Source] = []
+    status: str = "pending"
+    error: Optional[str] = None
 ```
 
 ---
 
-## 5. Technology Stack
+## 🛠️ Step-by-Step Setup Guide
 
-### Backend
-* **Python 3.10+**
-* **FastAPI** & **Uvicorn** (REST API)
-* **LangGraph** (State graph workflow orchestration)
-* **LangChain** (`langchain-google-genai` / `langchain-openai`)
-* **Pydantic v2** (Structured data validation & state modeling)
-* **Tavily API** (Web search tool)
-* **Semantic Scholar API** (Academic research tool)
-* **Pytest** (Automated unit & integration testing)
-
-### Frontend
-* **React 19** & **Vite**
-* **Tailwind CSS v4** (Modern dark-themed UI)
-* **Lucide React** (Iconography)
-* **React Markdown** (Report rendering)
-
----
-
-## 6. Project Structure
-
-```text
-multi-agent-research/
-├── app/
-│   ├── agents/
-│   │   ├── orchestrator.py    # Decomposes query into research tasks
-│   │   ├── researcher.py      # Web research agent node
-│   │   ├── academic.py        # Academic literature agent node
-│   │   ├── fact_checker.py    # Claim validation & confidence agent node
-│   │   └── synthesizer.py     # Final report compiler node
-│   │
-│   ├── tools/
-│   │   ├── web_search.py      # Tavily web search integration
-│   │   └── academic_search.py # Semantic Scholar search integration
-│   │
-│   ├── models/
-│   │   └── research.py        # Pydantic data models & state
-│   │
-│   ├── workflow/
-│   │   └── graph.py           # LangGraph StateGraph workflow definition
-│   │
-│   ├── config.py              # LLM provider & environment setup
-│   └── main.py                # FastAPI endpoints & CORS
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Header.jsx
-│   │   │   ├── QueryInput.jsx
-│   │   │   ├── ProgressTracker.jsx
-│   │   │   ├── ReportViewer.jsx
-│   │   │   ├── VerifiedClaimsCard.jsx
-│   │   │   ├── SourcesDrawer.jsx
-│   │   │   └── StateInspector.jsx
-│   │   ├── services/
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   └── index.css
-│   └── package.json
-│
-├── tests/
-│   ├── test_health.py
-│   ├── test_models.py
-│   ├── test_tools.py
-│   ├── test_agents.py
-│   ├── test_workflow.py
-│   └── test_api.py
-│
-├── .env.example
-├── requirements.txt
-└── README.md
-```
-
----
-
-## 7. Installation & Setup
-
-### Prerequisites
-* Python 3.10+
-* Node.js v18+ & npm
-
-### 1. Backend Setup
+### 1. Backend Environment Setup
 
 ```bash
-# Clone or navigate to directory
-cd "multi-agent-research"
+# Navigate to repository root
+cd multi-agent-research-system
 
-# Create Python virtual environment
+# Create & activate virtual environment
 python -m venv .venv
-
-# Activate virtual environment
-# Windows:
+# On Windows:
 .\.venv\Scripts\activate
-# macOS/Linux:
+# On macOS/Linux:
 source .venv/bin/activate
 
-# Install backend dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# Copy environment configuration template
+# Create .env file from template
 cp .env.example .env
 ```
 
 ### 2. Configure Environment Variables (`.env`)
-
-Edit `.env` to configure your API keys:
 
 ```env
 LLM_PROVIDER=gemini  # Supported: gemini, openai
@@ -212,41 +171,21 @@ HOST=0.0.0.0
 PORT=8000
 ```
 
-> **Note on Demo Mode**: If no LLM or Tavily API key is provided, the backend seamlessly operates in **Simulated Fallback Mode**, returning realistic research data to enable full frontend and workflow testing out of the box.
+> 💡 **Note on Demo/Fallback Mode**: If no LLM or Tavily API key is provided, the system operates in **Simulated Fallback Mode**, generating realistic research data for immediate frontend and workflow testing.
 
 ### 3. Frontend Setup
 
 ```bash
 cd frontend
 npm install
-```
-
----
-
-## 8. Running Locally
-
-### Start Backend API Server
-
-```bash
-# From workspace root with .venv activated:
-uvicorn app.main:app --reload --port 8000
-```
-
-The backend server runs at `http://localhost:8000`.
-
-### Start Frontend Development Server
-
-```bash
-# In another terminal window:
-cd frontend
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+The frontend dashboard runs at `http://localhost:3000`.
 
 ---
 
-## 9. API Endpoints
+## 📡 API Reference
 
 ### Health Check
 
@@ -264,14 +203,12 @@ GET /health
 }
 ```
 
-### Execute Research
+### Execute Research Pipeline
 
 ```http
 POST /api/research
-```
+Content-Type: application/json
 
-**Request**:
-```json
 {
   "query": "What is the impact of generative AI on software engineering jobs?"
 }
@@ -290,44 +227,46 @@ POST /api/research
       "source_type": "web"
     }
   ],
-  "tasks": [],
-  "verified_claims": []
+  "tasks": [...],
+  "verified_claims": [...]
 }
 ```
 
 ---
 
-## 10. Running Tests
+## 🧪 Running Automated Tests
 
-Execute the automated test suite with pytest:
+Run the full pytest suite:
 
 ```bash
-.\.venv\Scripts\python.exe -m pytest -v
+pytest -v
 ```
 
-Test coverage includes:
-* `test_health.py` (API `/health` endpoint)
-* `test_models.py` (Pydantic data models & state validation)
-* `test_tools.py` (Tavily & Semantic Scholar search tools)
-* `test_agents.py` (Orchestrator, Researcher, Academic, Fact Checker, Synthesizer)
-* `test_workflow.py` (LangGraph state graph execution)
-* `test_api.py` (FastAPI `POST /api/research` route)
+**Coverage Includes**:
+- `test_health.py`: Endpoint availability and health status.
+- `test_models.py`: Pydantic schema validation and state transitions.
+- `test_tools.py`: Web and academic search tool integrations.
+- `test_agents.py`: Individual node execution logic.
+- `test_workflow.py`: End-to-end LangGraph StateGraph execution.
+- `test_api.py`: FastAPI route integration.
 
 ---
 
-## 11. Interview Talking Points & Design Decisions
+## 💡 Key Design Decisions & Interview Talking Points
 
-### Why use specialized agents instead of one large LLM prompt?
-1. **Separation of Concerns**: Delegation allows web tools, paper search tools, and fact-checking logic to execute independently without cluttering prompt contexts.
-2. **Auditability & Verification**: The `Fact Checker Agent` acts as a guardrail, explicitly measuring claim confidence before report synthesis.
-3. **Citation Integrity**: The `Synthesizer Agent` is strictly instructed to only cite sources present in `ResearchState.sources`, preventing fake URL hallucinations.
-4. **Deterministic Orchestration**: LangGraph provides explicit control flow (`START -> Orchestrator -> Research & Academic -> Fact Checker -> Synthesizer -> END`) rather than unbounded autonomous loops.
+1. **Why LangGraph over standard chains?**  
+   LangGraph provides cyclic state graph capabilities, explicit state transitions, and easy inspection of intermediate node states (tasks, findings, verified claims) compared to linear chains.
+2. **Auditability & Fact Checking**:  
+   The `Fact Checker Agent` introduces explicit guardrails, tagging each claim with a confidence level before the synthesizer generates the final report.
+3. **Zero-Hallucination Citation Policy**:  
+   The `Synthesizer Agent` is constrained by strict system prompts to only reference items present in `ResearchState.sources`.
 
 ---
 
-## 12. Future Improvements
+## 🔮 Future Roadmap
 
-* **Streaming Agent Progress**: Implement Server-Sent Events (SSE) or WebSockets to stream state transitions in real time to the frontend.
-* **Document RAG Ingestion**: Add PDF upload and vector search (FAISS / ChromaDB) for custom research papers.
-* **Human-in-the-Loop**: Allow users to approve or edit research tasks before agent execution.
-* **PDF Export**: Export generated reports directly to formatted PDF documents.
+- ⚡ **Real-Time Streaming**: Server-Sent Events (SSE) for streaming graph step updates to the UI.
+- 📄 **Document RAG**: PDF/Document upload with FAISS vector search integration.
+- 👤 **Human-in-the-Loop**: Interactive approval step for query subtasks before execution.
+- 📥 **Export to PDF**: One-click PDF report generation and download.
+
