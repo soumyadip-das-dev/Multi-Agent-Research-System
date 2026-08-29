@@ -1,5 +1,5 @@
-from app.tools.web_search import search_web
-from app.tools.academic_search import search_academic
+from app.tools import search_web, search_academic
+
 
 
 def test_web_search_empty_query():
