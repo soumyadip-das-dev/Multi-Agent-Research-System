@@ -1,5 +1,5 @@
 import pytest
-from app.models.research import (
+from app.models import (
     ResearchTask,
     Source,
     Finding,
@@ -8,6 +8,7 @@ from app.models.research import (
     ResearchRequest,
     ResearchResponse
 )
+
 
 
 def test_research_task_model():
