@@ -1,9 +1,12 @@
-from app.models.research import ResearchState, ResearchTask
-from app.agents.orchestrator import run_orchestrator
-from app.agents.researcher import run_researcher
-from app.agents.academic import run_academic
-from app.agents.fact_checker import run_fact_checker
-from app.agents.synthesizer import run_synthesizer
+from app.models import ResearchState, ResearchTask
+from app.agents import (
+    run_orchestrator,
+    run_researcher,
+    run_academic,
+    run_fact_checker,
+    run_synthesizer
+)
+
 
 
 def test_orchestrator_agent():
