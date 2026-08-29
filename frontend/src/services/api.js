@@ -35,3 +35,45 @@ export async function executeResearch(query) {
 
   return await res.json();
 }
+
+/**
+ * Retrieves registered Model Context Protocol (MCP) tools.
+ */
+export async function fetchMCPTools() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/mcp/tools`);
+    if (res.ok) {
+      return await res.json();
+    }
+    return { mcp_server: 'Unknown', tools: [] };
+  } catch (err) {
+    console.error('Failed to fetch MCP tools:', err);
+    return { mcp_server: 'Offline', tools: [] };
+  }
+}
+
+/**
+ * Directly invokes an MCP tool via API.
+ * @param {string} toolName 
+ * @param {object} args 
+ */
+export async function callMCPTool(toolName, args = {}) {
+  const res = await fetch(`${API_BASE_URL}/api/mcp/call`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      tool_name: toolName,
+      arguments: args,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Failed to execute MCP tool '${toolName}'.`);
+  }
+
+  return await res.json();
+}
+
