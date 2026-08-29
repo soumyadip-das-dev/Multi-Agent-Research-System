@@ -1,4 +1,5 @@
-from app.workflow.graph import run_research_workflow
+from app.workflow import run_research_workflow
+
 
 
 def test_full_research_workflow():
