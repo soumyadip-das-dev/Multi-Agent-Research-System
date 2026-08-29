@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Copy, Check, ExternalLink, FileText } from 'lucide-react';
+import { Copy, Check, ExternalLink } from 'lucide-react';
 
 export default function ReportViewer({ report }) {
   const [copied, setCopied] = useState(false);
@@ -15,56 +15,47 @@ export default function ReportViewer({ report }) {
 
   const markdownComponents = {
     a: ({ node, ...props }) => (
-      <a {...props} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-blue-400 hover:underline">
+      <a {...props} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-slate-900 underline hover:text-slate-600">
         {props.children}
         <ExternalLink className="w-3 h-3 inline" />
       </a>
     ),
     code: ({ node, inline, className, children, ...props }) => {
       const text = String(children).replace(/\n$/, '');
-      if (text === 'HIGH') {
-        return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800">HIGH</span>;
+      if (text === 'HIGH' || text === 'MEDIUM' || text === 'LOW') {
+        return <span className="inline-block px-1.5 py-0.5 rounded text-[11px] font-mono border border-slate-300 text-slate-800 bg-slate-100">{text}</span>;
       }
-      if (text === 'MEDIUM') {
-        return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-amber-950/80 text-amber-400 border border-amber-800">MEDIUM</span>;
-      }
-      if (text === 'LOW') {
-        return <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold bg-rose-950/80 text-rose-400 border border-rose-800">LOW</span>;
-      }
-      return <code {...props} className="bg-slate-950 px-1.5 py-0.5 rounded text-slate-200 border border-slate-800 font-mono text-xs">{children}</code>;
+      return <code {...props} className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-800 font-mono text-xs border border-slate-200">{children}</code>;
     }
   };
 
   return (
-    <div className="bg-slate-900 rounded-xl p-6 sm:p-7 mb-6 border border-slate-800 shadow-xl text-slate-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-5 border-b border-slate-800 gap-3">
-        <div className="flex items-center gap-2.5">
-          <FileText className="w-5 h-5 text-blue-400" />
-          <div>
-            <h2 className="text-lg font-bold text-white">Synthesized Research Report</h2>
-            <p className="text-xs text-slate-400">Multi-agent findings compiled from web & literature citations</p>
-          </div>
+    <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-xs text-slate-900">
+      <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-200">
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Synthesized Research Report</h2>
+          <p className="text-xs text-slate-500">Compiled from web and academic literature evidence</p>
         </div>
 
         <button
           onClick={handleCopy}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs border border-slate-700 transition cursor-pointer shrink-0"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs border border-slate-200 transition cursor-pointer shrink-0"
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400 font-medium">Copied Report</span>
+              <Check className="w-3.5 h-3.5 text-slate-900" />
+              <span className="text-slate-900 font-medium">Copied</span>
             </>
           ) : (
             <>
-              <Copy className="w-3.5 h-3.5 text-slate-400" />
-              <span>Copy Markdown</span>
+              <Copy className="w-3.5 h-3.5 text-slate-500" />
+              <span>Copy Report</span>
             </>
           )}
         </button>
       </div>
 
-      <div className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed space-y-4">
+      <div className="prose prose-slate max-w-none text-slate-800 text-sm leading-relaxed space-y-4">
         <ReactMarkdown components={markdownComponents}>
           {report}
         </ReactMarkdown>
