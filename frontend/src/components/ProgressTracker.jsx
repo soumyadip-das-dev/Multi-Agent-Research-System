@@ -2,45 +2,49 @@ import React from 'react';
 import { Loader2, Check } from 'lucide-react';
 
 const AGENT_STEPS = [
-  { id: 1, name: '1. Orchestrator' },
-  { id: 2, name: '2. Web Search' },
-  { id: 3, name: '3. Academic Search' },
-  { id: 4, name: '4. Fact Checker' },
-  { id: 5, name: '5. Synthesizer' },
+  { id: 1, name: '1. Orchestrator', role: 'Decomposes task' },
+  { id: 2, name: '2. Web Search', role: 'Executes web_search' },
+  { id: 3, name: '3. Academic Search', role: 'Executes academic_search' },
+  { id: 4, name: '4. Fact Checker', role: 'Audits evidence' },
+  { id: 5, name: '5. Synthesizer', role: 'Compiles report' },
 ];
 
 export default function ProgressTracker({ isLoading, isCompleted }) {
   if (!isLoading && !isCompleted) return null;
 
   return (
-    <div className="bg-white rounded-xl p-5 mb-6 border border-slate-200 shadow-xs">
-      <div className="mb-3">
-        <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+    <div className="bg-slate-900 rounded-xl p-5 mb-6 border border-slate-800 shadow-xl">
+      <div className="mb-3.5 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
           {isLoading ? (
-            <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+            <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
           ) : (
-            <Check className="w-4 h-4 text-emerald-600" />
+            <Check className="w-4 h-4 text-emerald-400" />
           )}
-          Execution Progress
+          <span>Workflow Node Execution</span>
         </h3>
+        <span className="text-xs text-slate-400 font-mono">
+          {isCompleted ? 'Status: 100% Completed' : 'Status: Processing Graph Nodes...'}
+        </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
         {AGENT_STEPS.map((step) => {
-          const isDone = isCompleted || (!isLoading && isCompleted);
+          const isDone = isCompleted;
 
           return (
             <div
               key={step.id}
-              className={`p-3 rounded-lg border text-xs text-center ${
+              className={`p-3 rounded-lg border text-xs text-left transition-all ${
                 isDone
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                  ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-200'
                   : isLoading
-                  ? 'bg-blue-50 border-blue-200 text-blue-900'
-                  : 'bg-slate-50 border-slate-200 text-slate-500'
+                  ? 'bg-blue-950/40 border-blue-800/60 text-blue-200 animate-pulse'
+                  : 'bg-slate-950/40 border-slate-800 text-slate-500'
               }`}
             >
-              <div className="font-semibold text-slate-900">{step.name}</div>
+              <div className="font-semibold">{step.name}</div>
+              <div className="text-[11px] opacity-75 mt-0.5">{step.role}</div>
             </div>
           );
         })}
@@ -48,7 +52,3 @@ export default function ProgressTracker({ isLoading, isCompleted }) {
     </div>
   );
 }
-
-
-
-
